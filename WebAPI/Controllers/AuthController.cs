@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 using WebAPI.Business;
 using WebAPI.Models;
 using WebAPI.Security;
@@ -20,6 +21,7 @@ namespace WebAPI.Controllers
         [HttpPost("login")]
         public IActionResult Login(UserDto userDto)
         {
+            var assembly=Assembly.GetExecutingAssembly();
             var result=_authManager.Login(userDto);
             if (result==null)
             {
