@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebAPI.Security;
 
 namespace WebAPI
 {
@@ -29,6 +30,9 @@ namespace WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<ITokenGenerator,JwtGenerator>();
+
+            var tokenOptions = Configuration.GetSection("TokenOptions").Get<TokenOptions>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -38,9 +42,9 @@ namespace WebAPI
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = "deneme",
-                        ValidAudience ="deneme",
-                        IssuerSigningKey= new SymmetricSecurityKey(Encoding.UTF8.GetBytes("security key anahtarý 40 karakterden uzun olmalýdýr"))
+                        ValidIssuer = tokenOptions.Issuer,
+                        ValidAudience = tokenOptions.Audience,
+                        IssuerSigningKey= new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenOptions.SecurityKey))
 
                     };
                 });

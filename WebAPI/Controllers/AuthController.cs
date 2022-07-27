@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Business;
+using WebAPI.Models;
 using WebAPI.Security;
 
 namespace WebAPI.Controllers
@@ -8,12 +10,22 @@ namespace WebAPI.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        [HttpGet("login")]
-        public IActionResult Login()
+        private readonly AuthManager _authManager;
+
+        public AuthController(ITokenGenerator tokenGenerator)
         {
-            var tokenGenerator = new JwtGenerator();
-            var token=tokenGenerator.GenerateToken();
-            return Ok(token);
+            _authManager = new AuthManager(tokenGenerator);
+        }
+
+        [HttpPost("login")]
+        public IActionResult Login(UserDto userDto)
+        {
+            var result=_authManager.Login(userDto);
+            if (result==null)
+            {
+                return Unauthorized();
+            }
+            return Ok(result);
         }
     }
 }

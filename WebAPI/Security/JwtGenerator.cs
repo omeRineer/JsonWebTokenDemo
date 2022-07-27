@@ -1,27 +1,42 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using WebAPI.Models;
 
 namespace WebAPI.Security
 {
-    public class JwtGenerator
+    public class JwtGenerator:ITokenGenerator
     {
-        public string GenerateToken()
+        private readonly IConfiguration Configuration;
+        private readonly TokenOptions tokenOptions;
+        public JwtGenerator(IConfiguration configuration)
         {
+            Configuration = configuration;
+            tokenOptions = Configuration.GetSection("TokenOptions").Get<TokenOptions>();
+        }
+        
+        public AccessToken GenerateToken(User user)
+        {
+            var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenOptions.SecurityKey)), SecurityAlgorithms.HmacSha256);
             var securityToken = new JwtSecurityToken
                 (
-                    issuer:"deneme",
-                    audience: "deneme",
-                    expires: System.DateTime.UtcNow.AddDays(1),
-                    notBefore: System.DateTime.Now,
-                    signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes("security key anahtarı 40 karakterden uzun olmalıdır")),
-                    SecurityAlgorithms.HmacSha256)
+                    issuer:tokenOptions.Issuer,
+                    audience: tokenOptions.Audience,
+                    expires: DateTime.Now.AddDays(tokenOptions.ExpirationTime),
+                    notBefore: DateTime.Now,
+                    signingCredentials: signingCredentials
 
                 );
 
             string token=new JwtSecurityTokenHandler().WriteToken(securityToken);
-            return token;
+            var accessToken = new AccessToken
+            {
+                Token = token,
+            };
+            return accessToken;
         }
     }
 }
