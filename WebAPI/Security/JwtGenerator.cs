@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -25,6 +26,7 @@ namespace WebAPI.Security
                 (
                     issuer:tokenOptions.Issuer,
                     audience: tokenOptions.Audience,
+                    claims:GetUserClaims(user),
                     expires: DateTime.Now.AddDays(tokenOptions.ExpirationTime),
                     notBefore: DateTime.Now,
                     signingCredentials: signingCredentials
@@ -37,6 +39,20 @@ namespace WebAPI.Security
                 Token = token,
             };
             return accessToken;
+        }
+
+        private List<Claim> GetUserClaims(User user)
+        {
+            var claims = new List<Claim>();
+            foreach (var role in user.Roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
+            claims.Add(new Claim(ClaimTypes.Name, user.FirstName));
+            claims.Add(new Claim(ClaimTypes.Email, user.Email));
+
+            return claims;
         }
     }
 }

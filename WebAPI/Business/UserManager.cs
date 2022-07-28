@@ -15,7 +15,8 @@ namespace WebAPI.Business
                 LastName="Sandıkçı",
                 UserName="deneme123",
                 Password="123456",
-                Email="deneme321@gmail.com"
+                Email="deneme321@gmail.com",
+                Roles=new string[]{"admin"}
             },
             new User
             {
@@ -24,7 +25,8 @@ namespace WebAPI.Business
                 LastName="Sandıkçı",
                 UserName="hatice789",
                 Password="654321",
-                Email="hatice789@gmail.com"
+                Email="hatice789@gmail.com",
+                Roles=new string[]{"user"}
             }
         };
 

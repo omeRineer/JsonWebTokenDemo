@@ -4,12 +4,21 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers
 {
-    [Authorize]
+    
     [Route("api/[controller]")]
     [ApiController]
     public class TestController : ControllerBase
     {
-        [HttpGet]
+        [Authorize(Roles = "admin")]
+        [HttpPost("add")]
+        public IActionResult Add()
+        {
+            return Ok("Add method");
+        }
+
+
+        [Authorize(Roles = "user")]
+        [HttpGet("get")]
         public IActionResult Get()
         {
             return Ok("Get method");
